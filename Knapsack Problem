@@ -1,1 +1,93 @@
 
+Problem statement:
+The Problem: You are a thief with a knapsack that can hold a maximum weight w . There are
+N items in a room. Each item has a weight and a value . You want to maximize the total
+value in your bag.
+
+The constraint is "0/1": You can either take the item whole (1) or leave it (O). You cannot break it.
+
+Step 1: Think Recursively (The "Choice" Diagram)
+Imagine you are standing at the last item (index n-1 ). You have a bag with some remaining
+capacity w . You have exactly two choices for this item:
+
+1. Don't Pick it (Exclude): You decide this item is too heavy or not valuable enough. You skip
+it and move to the next item (index n-2 ) with your bag capacity unchanged.
+
+2. Pick it (Include): You put it in your bag. You gain its value , but your bag capacity shrinks
+by its weight . You then move to the next item (index n-2 ) with less capacity.
+
+Note: You can only pick the item if its weight is less than or equal to the current bag capacity.
+
+Step 2: The Recursive Line (Recurrence Relation)
+
+Our state needs two variables: the index of the item we are considering, and the current
+capacity of the bag.
+
+f(i,w)= max(Don'tPick, Pick)
+
+Where:
+
+. Don'tPick = f(i-1,w)
+· Pick = value[i] + f(i - 1, w - weight[¿])
+
+Pattern  identification:
+· How to Identify:
+· You are given a set of items with attributes (cost, value, weight).
+
+· You have a constraint or a target (max weight, target sum).
+
+. You need to select a subset of these items to maximize/minimize a value or count
+ways.
+
+. Typical Questions:
+· 0/1 Knapsack: Maximize value within weight limit.
+
+. Subset Sum: Is there a subset of numbers that sums up to K ? (Here, "value" is
+ignored, we just care if capacity becomes O).
+
+. Partition Equal Subset Sum: Can you split an array into two subsets with equal
+sums?
+
+
+class Solution {
+// dp[index][weight]
+int[][] memo;
+
+public int knapsack(int[] weights, int[] values, int capacity, int n) {
+// Initialize memoization table
+// Rows: items (0 to n), Cols: capacity (0 to capacity)
+memo = new int[n][capacity + 1];
+for (int[] row : memo) java.util.Arrays.fill(row, -1);
+
+// Start thinking from the last item
+return solve(weights, values, n - 1, capacity);
+
+private int solve(int[] weights, int[] values, int index, int currentCap) {
+// Base Case: We ran out of items
+if (index < 0) {
+return 0;
+
+// Base Case: If we are at the very first item (index 0)
+if (index == 0) {
+// If we have space, we steal it. Otherwise 0.
+if (weights[0] <= currentCap) return values[0];
+return 0;
+
+// Return if already calculated
+if (memo[index] [currentCap] != -1) return memo[index] [currentCap];
+
+// CHOICE 1: DON'T PICK
+// Move to index-1, capacity stays same
+int notPick = 0 + solve(weights, values, index - 1, currentCap);
+
+// CHOICE 2: PICK
+// Move to index-1, capacity reduces by weights[index]
+// Add values[index] to our profit
+int pick = Integer.MIN_VALUE;
+if (weights[index] <= currentCap) {
+pick = values[index] + solve(weights, values, index - 1, currentCap - weights[index]);
+
+// Store and return the max of the two choices
+return memo[index] [currentCap]=Math.max(pick, notPick);
+
+}
